@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="AmbiguousAuthScheme"><value>Ambiguous authentication scheme credentials provided Request contains authentication credentials for signed access and authenticated access</value></data>
+  <data name="InvalidSignedTimeRange"><value>Signed expiry time [{0}] has to be after signed start time [{1}]</value></data>
+  <data name="AtomFormatNotSupported"><value>Atom format is not supported.</value></data>
+  <data name="InvalidIPRange"><value>The startAddress must not exceed the endAddress.</value></data>
+  <data name="RowKeyTooLarge"><value>The 'RowKey' property exceeds the maximum allowed key size ({0} characters)</value></data>
+  <data name="InvalidAccountDuplicateService"><value>Invalid duplicate service. Error at index  {0} of {1}</value></data>
+  <data name="UnimplementedOperation"><value>The requested operation is not supported.</value></data>
+  <data name="SignedTimeRangeNotApplicable"><value>Signature not valid in the specified time frame: Start [{0}] - Expiry [{1}] - Current [{2}]</value></data>
+  <data name="PartitionKeyTooLarge"><value>The 'PartitionKey' property exceeds the maximum allowed key size ({0} characters)</value></data>
+  <data name="InvalidSignatureFields"><value>Signature fields not well formed.</value></data>
+  <data name="PropertyNameCurrentlyNotSupported"><value>The property name '{0}' is currently not supported.</value></data>
+  <data name="IPIsEmpty"><value>sip is optional but cannot be empty</value></data>
+  <data name="OutOfRangeInput"><value>The '{0}' parameter of value '{1}' is out of range.</value></data>
+  <data name="PropertyNameInvalid"><value>The property name '{0}' is invalid. See https://docs.microsoft.com/en-us/rest/api/storageservices/Understanding-the-Table-Service-Data-Model</value></data>
+  <data name="IPFromDifferentFamilies"><value>Cannot compare two addresses of different address families</value></data>
+  <data name="InvalidSignedProtocol"><value>Invalid signedProtocol {0}</value></data>
+  <data name="InvalidSASPermissionForTable"><value>Character {0} is an invalid permission for {1}</value></data>
+  <data name="InvalidCIDRNotation"><value>Invalid CIDR notation: {0}</value></data>
+  <data name="MissingOrInvalidHeader"><value>The header {0} is either missing or malformed.</value></data>
+  <data name="InvalidAccountSASServcie"><value>Unexpected character {0} in service</value></data>
+  <data name="InvalidSIPFormat"><value>Invalid sip format</value></data>
+  <data name="InvalidSignedProtocolHttpOnly"><value>Invalid signed protocol. Specifying only http is not allowed</value></data>
+  <data name="SipSupportSingleIPRange"><value>sip only supports one range</value></data>
+  <data name="MalformedBatchRequest"><value>The batch request body is malformed. Please see https://docs.microsoft.com/en-us/rest/api/storageservices/performing-entity-group-transactions</value></data>
+  <data name="PartitionKeyOrRowKeyEmpty"><value>PartitionKey/RowKey cannot be empty</value></data>
+  <data name="InvalidExtraPermission"><value>Unexpected character {0} in extra permission</value></data>
+  <data name="TableNameEmpty"><value>Table name cannot be empty.</value></data>
+  <data name="InvalidSignatureSize"><value>Signature size is invalid</value></data>
+  <data name="InvalidSASPermissionOrder"><value>Invalid order of permission. Error at index {0}  of {1}</value></data>
+  <data name="InvalidNetworkSuffix"><value>Invalid network prefix specified: {0}</value></data>
+  <data name="IPAuthorizationFailed"><value>This request is not authorized to perform this operation using this source IP {0}.</value></data>
+  <data name="InvalidSignedPermission"><value>Invalid signed permission. permission = {0}</value></data>
+  <data name="InvalidDuplicateExtraPermission"><value>Invalid duplicate extra permission. Error at index {0} of {1}</value></data>
+  <data name="MandatoryFieldEmpty"><value>{0} is mandatory. Cannot be empty</value></data>
+  <data name="OutOfRangeInputGeneric"><value>One of the request inputs is out of range.</value></data>
+  <data name="TableQueryFluentMethodNotAllowed"><value>Fluent methods may not be invoked on a Query created via CloudTable.CreateQuery&lt;T&gt;()</value></data>
+  <data name="MediaTypeNotSupported"><value>None of the provided media types are supported</value></data>
+  <data name="UnsupportedSASWithPkAndRK"><value>Shared access signature with PartitionKey or RowKey are not supported</value></data>
+  <data name="OperationTimedOut"><value>Operation could not be completed within the specified time.</value></data>
+  <data name="InvalidAccountResourceType"><value>Unexpected character {0} in signed resource type</value></data>
+  <data name="InvalidDottedQuadNotation"><value>IPv4 dotted-quad notation expected: {0}</value></data>
+  <data name="InvalidTableName"><value>Table name {0} is not supported</value></data>
+  <data name="VersionDontSupportSAS"><value>{0} is either not in the correct format or is not equal or later than version {1}</value></data>
+  <data name="MissingDependentParam"><value>{0} is required when {1} is provided.</value></data>
+  <data name="OptionalFieldCannotBeEmptyIfSpecified"><value>{0} is optional but cannot be empty</value></data>
+  <data name="InvalidIP"><value>Invalid ip specified: {0}</value></data>
+  <data name="SASNotSupportedForResourceType"><value>Shared access signature is not supported for this operation</value></data>
+  <data name="InvalidIPV4Format"><value>IPv4 format expected: {0}</value></data>
+  </root>

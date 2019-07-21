@@ -1,0 +1,7 @@
+source https://www.nuget.org/api/v2
+framework: netstandard2.0
+nuget Microsoft.Azure.DocumentDB.Core
+nuget Microsoft.OData.Core
+nuget Microsoft.CSharp
+nuget Newtonsoft.Json
+storage none
