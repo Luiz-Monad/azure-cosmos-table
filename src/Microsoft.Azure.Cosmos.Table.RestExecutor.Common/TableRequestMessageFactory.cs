@@ -33,7 +33,7 @@ namespace Microsoft.Azure.Cosmos.Table.RestExecutor.Common
 			}
 			if ((operation.OperationType == TableOperationType.Delete || operation.OperationType == TableOperationType.Replace || operation.OperationType == TableOperationType.Merge) && operation.ETag != null)
 			{
-				storageRequestMessage.Headers.Add("If-Match", operation.ETag);
+				storageRequestMessage.Headers.TryAddWithoutValidation("If-Match", operation.ETag);
 			}
 			if (operation.OperationType == TableOperationType.Insert)
 			{

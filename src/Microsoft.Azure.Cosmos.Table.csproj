@@ -9,6 +9,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DebugType>portable</DebugType>
     <OutDir>../build</OutDir>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
