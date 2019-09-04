@@ -40,7 +40,7 @@ namespace Microsoft.Azure.Cosmos.Table.Protocol
 
 		public const string Select = "$select";
 
-		public const string UserAgentProductVersion = "1.0.2";
+		public const string UserAgentProductVersion = "1.0.4";
 
 		public static readonly DateTimeOffset MinDateTime = new DateTimeOffset(1601, 1, 1, 0, 0, 0, TimeSpan.Zero);
 

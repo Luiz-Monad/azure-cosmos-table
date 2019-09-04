@@ -5,7 +5,7 @@ namespace Microsoft.Azure.Cosmos.Table
 {
 	using ConnectionProtocol = Microsoft.Azure.Documents.Client.Protocol;
 
-    public class CosmosExecutorConfiguration
+	public class CosmosExecutorConfiguration
 	{
 		public bool UseConnectionModeDirect
 		{
@@ -57,17 +57,17 @@ namespace Microsoft.Azure.Cosmos.Table
 			{
 				EnableEndpointDiscovery = true,
 				UseMultipleWriteLocations = true,
-				UserAgentSuffix = string.Format(" {0}/{1} {2}", "cosmos-table-sdk", "1.0.2", UserAgentSuffix)
+				UserAgentSuffix = string.Format(" {0}/{1} {2}", "cosmos-table-sdk", "1.0.4", UserAgentSuffix)
 			};
 			if (UseConnectionModeDirect)
 			{
 				connectionPolicy.ConnectionMode = ConnectionMode.Direct;
-				connectionPolicy.ConnectionProtocol = ConnectionProtocol.Tcp;
+				connectionPolicy.ConnectionProtocol = Microsoft.Azure.Documents.Client.Protocol.Tcp;
 			}
 			else
 			{
 				connectionPolicy.ConnectionMode = ConnectionMode.Gateway;
-				connectionPolicy.ConnectionProtocol = ConnectionProtocol.Https;
+				connectionPolicy.ConnectionProtocol = Microsoft.Azure.Documents.Client.Protocol.Https;
 				MaxConnectionLimit = MaxConnectionLimit;
 			}
 			if (!string.IsNullOrEmpty(CurrentRegion))

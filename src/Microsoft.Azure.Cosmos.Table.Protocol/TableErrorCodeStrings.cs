@@ -1,6 +1,6 @@
 namespace Microsoft.Azure.Cosmos.Table.Protocol
 {
-	internal static class TableErrorCodeStrings
+	public static class TableErrorCodeStrings
 	{
 		public static readonly string XMethodNotUsingPost = "XMethodNotUsingPost";
 

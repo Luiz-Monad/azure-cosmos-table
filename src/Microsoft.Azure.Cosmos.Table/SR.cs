@@ -76,6 +76,8 @@ namespace Microsoft.Azure.Cosmos.Table
 
 		public const string StorageUriMustMatch = "Primary and secondary location URIs in a StorageUri must point to the same resource.";
 
+		public const string NegativeBytesRequestedInCopy = "Internal Error - negative copyLength requested when attempting to copy a stream.  CopyLength = {0}, totalBytes = {1}.";
+
 		public const string NoPropertyResolverAvailable = "No property resolver available. Deserializing the entity properties as strings.";
 
 		public const string OperationCanceled = "Operation was canceled by user.";
@@ -101,6 +103,12 @@ namespace Microsoft.Azure.Cosmos.Table
 		public const string SetServicePropertiesRequiresNonNullSettings = "At least one service property needs to be non-null for SetServiceProperties API.";
 
 		public const string Share = "share";
+
+		public const string StreamLengthError = "The length of the stream exceeds the permitted length.";
+
+		public const string StreamLengthMismatch = "Cannot specify both copyLength and maxLength.";
+
+		public const string StreamLengthShortError = "The requested number of bytes exceeds the length of the stream remaining from the specified position.";
 
 		public const string Table = "table";
 

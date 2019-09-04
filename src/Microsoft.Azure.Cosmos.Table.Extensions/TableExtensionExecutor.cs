@@ -8,6 +8,17 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 {
 	internal sealed class TableExtensionExecutor : IExecutor
 	{
+		internal string TombstoneFieldName
+		{
+			get;
+			set;
+		}
+
+		public TableExtensionExecutor()
+		{
+			TombstoneFieldName = null;
+		}
+
 		public TResult ExecuteTableOperation<TResult>(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions requestOptions, OperationContext operationContext) where TResult : class
 		{
 			return TaskHelper.InlineIfPossible(() => ExecuteTableOperationAsync<TResult>(operation, client, table, requestOptions, operationContext, CancellationToken.None), null).GetAwaiter().GetResult();
@@ -107,7 +118,7 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 			{
 				try
 				{
-					return await TableExtensionQueryHelper.QueryDocumentsAsync(query.TakeCount, string.IsNullOrEmpty(query.FilterString) ? query.FilterString : ODataV3Translator.TranslateFilter(query.FilterString, useUtcTicks: false), query.SelectColumns, token, client, table, resolver, requestOptions, operationContext, isLinq, query.OrderByEntities);
+					return await TableExtensionQueryHelper.QueryDocumentsAsync(query.TakeCount, string.IsNullOrEmpty(query.FilterString) ? query.FilterString : ODataV3Translator.TranslateFilter(query.FilterString, useUtcTicks: false), query.SelectColumns, token, client, table, resolver, requestOptions, operationContext, isLinq, query.OrderByEntities, TombstoneFieldName);
 				}
 				catch (Exception exception)
 				{
@@ -129,7 +140,7 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 					{
 						return await TableExtensionQueryHelper.QueryCollectionsAsync<TResult>(query.TakeCount, string.IsNullOrEmpty(query.FilterString) ? query.FilterString : ODataV3Translator.TranslateFilter(query.FilterString, useUtcTicks: false), token, client, table, requestOptions, operationContext);
 					}
-					return await TableExtensionQueryHelper.QueryDocumentsAsync(query.TakeCount, string.IsNullOrEmpty(query.FilterString) ? query.FilterString : ODataV3Translator.TranslateFilter(query.FilterString, useUtcTicks: false), query.SelectColumns, token, client, table, resolver, requestOptions, operationContext, isLinq, query.OrderByEntities);
+					return await TableExtensionQueryHelper.QueryDocumentsAsync(query.TakeCount, string.IsNullOrEmpty(query.FilterString) ? query.FilterString : ODataV3Translator.TranslateFilter(query.FilterString, useUtcTicks: false), query.SelectColumns, token, client, table, resolver, requestOptions, operationContext, isLinq, query.OrderByEntities, TombstoneFieldName);
 				}
 				catch (Exception exception)
 				{

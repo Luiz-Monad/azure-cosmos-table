@@ -18,8 +18,9 @@ namespace Microsoft.Azure.Cosmos.Tables.SharedFiles
 
 		private const string SelectAll = "*";
 
-		internal static string GetSqlQuery(string selectList, string filterString, bool isLinqExpression, bool isTableQuery, IList<OrderByItem> orderByItems, bool enableTimestampQuery = false)
+		internal static string GetSqlQuery(string selectList, string filterString, bool isLinqExpression, bool isTableQuery, IList<OrderByItem> orderByItems, string tombstoneKey = null, bool enableTimestampQuery = false)
 		{
+			string text = (tombstoneKey == null) ? null : ("not (is_defined(entity['" + tombstoneKey + "']['$v']))");
 			if (string.IsNullOrEmpty(selectList) && string.IsNullOrEmpty(filterString))
 			{
 				throw new ArgumentException("All arguments cannot be null for query");
@@ -28,16 +29,24 @@ namespace Microsoft.Azure.Cosmos.Tables.SharedFiles
 			{
 				selectList = "*";
 			}
-			string text = OrderByClause(enableTimestampQuery, orderByItems);
+			string text2 = OrderByClause(enableTimestampQuery, orderByItems);
 			if (string.IsNullOrEmpty(filterString))
 			{
-				return string.Format(CultureInfo.InvariantCulture, "select {0} from entity {1}", selectList, text);
+				if (string.IsNullOrEmpty(tombstoneKey))
+				{
+					return string.Format(CultureInfo.InvariantCulture, "select {0} from entity {1}", selectList, text2);
+				}
+				return string.Format(CultureInfo.InvariantCulture, "select {0} from entity where {1} {2}", selectList, text, text2);
 			}
 			if (!isLinqExpression)
 			{
 				try
 				{
 					filterString = ODataFilterTranslator.ToSql(filterString, isTableQuery, enableTimestampQuery);
+					if (!string.IsNullOrEmpty(tombstoneKey))
+					{
+						filterString = "(" + filterString + ") and " + text;
+					}
 				}
 				catch (Exception ex)
 				{
@@ -48,7 +57,7 @@ namespace Microsoft.Azure.Cosmos.Tables.SharedFiles
 					throw;
 				}
 			}
-			return string.Format(CultureInfo.InvariantCulture, "select {0} from entity where {1} {2}", selectList, filterString, text);
+			return string.Format(CultureInfo.InvariantCulture, "select {0} from entity where {1} {2}", selectList, filterString, text2);
 		}
 
 		public static string GetSelectString(string selectList)

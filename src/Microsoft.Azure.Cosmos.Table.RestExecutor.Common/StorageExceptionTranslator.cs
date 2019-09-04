@@ -37,7 +37,7 @@ namespace Microsoft.Azure.Cosmos.Table.RestExecutor.Common
 			return new StorageException(reqResult, ex.Message, ex);
 		}
 
-		internal static async Task<StorageException> TranslateExceptionWithPreBufferedStreamAsync(Exception ex, RequestResult reqResult, Stream responseStream, HttpResponseMessage response, Func<Stream, HttpResponseMessage, string, CancellationToken, Task<StorageExtendedErrorInformation>> parseErrorAsync)
+		internal static async Task<StorageException> TranslateExceptionWithPreBufferedStreamAsync(Exception ex, RequestResult reqResult, Stream responseStream, HttpResponseMessage response, Func<Stream, HttpResponseMessage, string, CancellationToken, Task<StorageExtendedErrorInformation>> parseErrorAsync, CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -51,11 +51,11 @@ namespace Microsoft.Azure.Cosmos.Table.RestExecutor.Common
 					PopulateRequestResult(reqResult, response);
 					if (parseErrorAsync == null)
 					{
-						reqResult.ExtendedErrorInformation = await StorageExtendedErrorInformationRestHelper.ReadFromStreamAsync(responseStream, CancellationToken.None);
+						reqResult.ExtendedErrorInformation = await StorageExtendedErrorInformationRestHelper.ReadFromStreamAsync(responseStream, cancellationToken);
 					}
 					else
 					{
-						reqResult.ExtendedErrorInformation = parseErrorAsync(responseStream, response, response.Content.Headers.ContentType.ToString(), CancellationToken.None).Result;
+						reqResult.ExtendedErrorInformation = parseErrorAsync(responseStream, response, response.Content.Headers.ContentType.ToString(), cancellationToken).Result;
 					}
 				}
 			}

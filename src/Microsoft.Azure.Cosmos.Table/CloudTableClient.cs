@@ -24,6 +24,8 @@ namespace Microsoft.Azure.Cosmos.Table
 
 		private Lazy<IDocumentClient> lazyDocumentClient;
 
+		private Lazy<HttpClient> lazyHttpClient;
+
 		internal const string LegacyCosmosTableDomain = ".table.cosmosdb.";
 
 		internal const string CosmosTableDomain = ".table.cosmos.";
@@ -37,7 +39,15 @@ namespace Microsoft.Azure.Cosmos.Table
 				".documents-test.windows-int.net"
 			},
 			{
+				".table.cosmos.windows-int.net",
+				".documents-test.windows-int.net"
+			},
+			{
 				".table.cosmosdb.windows-ppe.net",
+				".documents-staging.windows-ppe.net"
+			},
+			{
+				".table.cosmos.windows-ppe.net",
 				".documents-staging.windows-ppe.net"
 			},
 			{
@@ -97,14 +107,10 @@ namespace Microsoft.Azure.Cosmos.Table
 		internal IExecutor Executor
 		{
 			get;
-			private set;
-		}
-
-		internal HttpClient HttpClient
-		{
-			get;
 			set;
 		}
+
+		internal HttpClient HttpClient => lazyHttpClient.Value;
 
 		internal IDocumentClient DocumentClient => lazyDocumentClient.Value;
 
@@ -134,7 +140,8 @@ namespace Microsoft.Azure.Cosmos.Table
 			{
 				AccountName = NavigationHelper.GetAccountNameFromUri(BaseUri, UsePathStyleUris);
 			}
-			lazyDocumentClient = new Lazy<IDocumentClient>(() => CreateDocumentClient());
+			lazyDocumentClient = new Lazy<IDocumentClient>(CreateDocumentClient);
+			lazyHttpClient = new Lazy<HttpClient>(CreateHttpClient);
 		}
 
 		public virtual CloudTable GetTableReference(string tableName)
@@ -231,7 +238,7 @@ namespace Microsoft.Azure.Cosmos.Table
 
 		internal ExpressionParser GetExpressionParser()
 		{
-			if (Executor is TableExtensionExecutor)
+			if (IsPremiumEndpoint())
 			{
 				return new TableExtensionExpressionParser();
 			}
@@ -359,7 +366,7 @@ namespace Microsoft.Azure.Cosmos.Table
 
 		private IDocumentClient CreateDocumentClient()
 		{
-			if (!(Executor is TableExtensionExecutor))
+			if (!IsPremiumEndpoint())
 			{
 				throw new NotSupportedException(string.Format("{0} api is not supported in the current version.", "Direct mode"));
 			}
@@ -369,11 +376,16 @@ namespace Microsoft.Azure.Cosmos.Table
 			return DocClientCreator(docDbDirectUrl, Credentials.Key, connectionPolicy, ToDocDbConsistencyLevel(cosmosExecutorConfiguration.ConsistencyLevel));
 		}
 
-		internal static ConsistencyLevel? ToDocDbConsistencyLevel(ConsistencyLevel? consistencyLevel)
+		private HttpClient CreateHttpClient()
+		{
+			return HttpClientFactory.HttpClientFromConfiguration(TableClientConfiguration.RestExecutorConfiguration);
+		}
+
+		internal static Microsoft.Azure.Documents.ConsistencyLevel? ToDocDbConsistencyLevel(ConsistencyLevel? consistencyLevel)
 		{
 			if (consistencyLevel.HasValue)
 			{
-				return (ConsistencyLevel)consistencyLevel.Value;
+				return (Microsoft.Azure.Documents.ConsistencyLevel)consistencyLevel.Value;
 			}
 			return null;
 		}
@@ -405,15 +417,16 @@ namespace Microsoft.Azure.Cosmos.Table
 			if (IsPremiumEndpoint())
 			{
 				Executor = new TableExtensionExecutor();
-				return;
 			}
-			Executor = new TableRestExecutor();
-			HttpClient = HttpClientFactory.HttpClientFromDelegatingHandler(TableClientConfiguration.RestExecutorConfiguration.DelegatingHandler);
+			else
+			{
+				Executor = new TableRestExecutor();
+			}
 		}
 
 		internal void AssertPremiumFeaturesOnlyToCosmosTables(int? throughput, string serializedIndexingPolicy)
 		{
-			if ((throughput.HasValue || serializedIndexingPolicy != null) && !IsPremiumEndpoint() && Executor.GetType() != typeof(TableExtensionExecutor))
+			if ((throughput.HasValue || serializedIndexingPolicy != null) && !IsPremiumEndpoint())
 			{
 				throw new NotSupportedException("Only direct mode supports throughput and indexing policy.");
 			}

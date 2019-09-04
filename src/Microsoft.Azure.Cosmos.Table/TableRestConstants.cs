@@ -139,11 +139,15 @@ namespace Microsoft.Azure.Cosmos.Table
 
 		public static readonly TimeSpan DefaultClientSideTimeout = TimeSpan.FromMinutes(5.0);
 
+		public static readonly TimeSpan DefaultHttpClientTimeout = TimeSpan.FromMinutes(2.0);
+
 		public static readonly TimeSpan MaximumRetryBackoff = TimeSpan.FromHours(1.0);
 
 		internal static readonly int MaximumAllowedRetentionDays = 365;
 
 		internal static readonly TimeSpan ResponseParserCancellationFallbackDelay = TimeSpan.FromSeconds(5.0);
+
+		internal const int DefaultBufferSize = 65536;
 
 		public const string ErrorMessage = "Message";
 

@@ -262,7 +262,7 @@ namespace Microsoft.Azure.Cosmos.Table
 
 		public virtual Task<TableQuerySegment<TResult>> ExecuteQuerySegmentedAsync<TElement, TResult>(TableQuery<TElement> query, EntityResolver<TResult> resolver, TableContinuationToken token, CancellationToken cancellationToken) where TElement : ITableEntity, new()
 		{
-			return ExecuteQuerySegmentedAsync(query, resolver, token, null, null, CancellationToken.None);
+			return ExecuteQuerySegmentedAsync(query, resolver, token, null, null, cancellationToken);
 		}
 
 		public virtual Task<TableQuerySegment<TResult>> ExecuteQuerySegmentedAsync<TElement, TResult>(TableQuery<TElement> query, EntityResolver<TResult> resolver, TableContinuationToken token, TableRequestOptions requestOptions, OperationContext operationContext) where TElement : ITableEntity, new()
@@ -385,7 +385,7 @@ namespace Microsoft.Azure.Cosmos.Table
 
 		public virtual Task<bool> CreateIfNotExistsAsync(TableRequestOptions requestOptions, OperationContext operationContext, CancellationToken cancellationToken)
 		{
-			return CreateIfNotExistsAsync(requestOptions, operationContext, null, null, CancellationToken.None);
+			return CreateIfNotExistsAsync(requestOptions, operationContext, null, null, cancellationToken);
 		}
 
 		public virtual Task<bool> CreateIfNotExistsAsync(IndexingMode indexingMode, int? throughput, CancellationToken cancellationToken)
@@ -621,7 +621,7 @@ namespace Microsoft.Azure.Cosmos.Table
 			IndexingPolicy indexingPolicy = new IndexingPolicy();
 			if (mode.HasValue)
 			{
-				indexingPolicy.IndexingMode = mode.Value;
+				indexingPolicy.IndexingMode = (Microsoft.Azure.Documents.IndexingMode)mode.Value;
 			}
 			return JsonConvert.SerializeObject(indexingPolicy);
 		}

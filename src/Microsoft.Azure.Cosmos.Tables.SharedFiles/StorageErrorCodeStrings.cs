@@ -1,6 +1,6 @@
 namespace Microsoft.Azure.Cosmos.Tables.SharedFiles
 {
-	internal static class StorageErrorCodeStrings
+	public static class StorageErrorCodeStrings
 	{
 		public static readonly string UnsupportedHttpVerb = "UnsupportedHttpVerb";
 

@@ -10,7 +10,7 @@ namespace Microsoft.Azure.Cosmos.Table
 	{
 		private bool hasQuery;
 
-		private List<TableOperation> operations = new List<TableOperation>();
+		internal List<TableOperation> operations = new List<TableOperation>();
 
 		internal string batchPartitionKey;
 

@@ -25,8 +25,7 @@ namespace Microsoft.Azure.Cosmos.Tables.SharedFiles
 			return await client.ReadDocumentCollectionAsync(uri.ToString());
 		}
 
-		public static async Task<ResourceResponse<DocumentCollection>> HandleCollectionFeedInsertAsync(
-			IDocumentClient client, string collectionName, IndexingPolicy indexingPolicy, RequestOptions requestOption)
+		public static async Task<ResourceResponse<DocumentCollection>> HandleCollectionFeedInsertAsync(IDocumentClient client, string collectionName, IndexingPolicy indexingPolicy, RequestOptions requestOption, CancellationToken cancellationToken)
 		{
 			await ThrowIfCollectionExists(client, collectionName);
 			RequestOptions requestOptions = requestOption;
@@ -95,12 +94,9 @@ namespace Microsoft.Azure.Cosmos.Tables.SharedFiles
 						"/'$pk'"
 					}
 				},
-				IndexingPolicy = (indexingPolicy != null
-					? new Documents.IndexingPolicy() {
-						IndexingMode = (Microsoft.Azure.Documents.IndexingMode)indexingPolicy.IndexingMode
-					}
-					: new Documents.IndexingPolicy(
-						Index.Range(Documents.DataType.Number, -1), Index.Range(Documents.DataType.String, -1)))
+				IndexingPolicy = (indexingPolicy 
+					?? new IndexingPolicy(
+						Index.Range(DataType.Number, -1), Index.Range(DataType.String, -1)))
 			}, requestOption);
 		}
 
@@ -145,8 +141,7 @@ namespace Microsoft.Azure.Cosmos.Tables.SharedFiles
 			}
 			catch (DocumentClientException)
 			{
-				// if (ex.StatusCode == HttpStatusCode.NotFound && !string.IsNullOrWhiteSpace(ex.ResourceAddress) && 
-				// 	ex.ResourceAddress.ToLowerInvariant().Contains("/docs/"))
+				// if (ex.StatusCode == HttpStatusCode.NotFound && !string.IsNullOrWhiteSpace(ex.ResourceAddress) && ex.ResourceAddress.ToLowerInvariant().Contains("/docs/"))
 				// {
 				// 	collectionExists = true;
 				// }

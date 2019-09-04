@@ -23,23 +23,23 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 				switch (operation.OperationType)
 				{
 				case TableOperationType.Insert:
-					tableResult = await HandleInsertAsync(operation, client, table, requestOptions, operationContext);
+					tableResult = await HandleInsertAsync(operation, client, table, requestOptions, operationContext, cancellationToken);
 					break;
 				case TableOperationType.Merge:
 				case TableOperationType.InsertOrMerge:
-					tableResult = await HandleMergeAsync(operation, client, table, requestOptions, operationContext);
+					tableResult = await HandleMergeAsync(operation, client, table, requestOptions, operationContext, cancellationToken);
 					break;
 				case TableOperationType.Delete:
-					tableResult = await HandleDeleteAsync(operation, client, table, requestOptions, operationContext);
+					tableResult = await HandleDeleteAsync(operation, client, table, requestOptions, operationContext, cancellationToken);
 					break;
 				case TableOperationType.InsertOrReplace:
-					tableResult = await HandleUpsertAsync(operation, client, table, requestOptions, operationContext);
+					tableResult = await HandleUpsertAsync(operation, client, table, requestOptions, operationContext, cancellationToken);
 					break;
 				case TableOperationType.Replace:
-					tableResult = await HandleReplaceAsync(operation, client, table, requestOptions, operationContext);
+					tableResult = await HandleReplaceAsync(operation, client, table, requestOptions, operationContext, cancellationToken);
 					break;
 				case TableOperationType.Retrieve:
-					tableResult = await HandleReadAsync(operation, client, table, requestOptions, operationContext);
+					tableResult = await HandleReadAsync(operation, client, table, requestOptions, operationContext, cancellationToken);
 					break;
 				default:
 					throw new NotSupportedException();
@@ -136,16 +136,16 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 			operationContext?.RequestResults.Add(storageException.ToRequestResult(serviceRequestId));
 		}
 
-		private static async Task<TableResult> HandleMergeAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context)
+		private static async Task<TableResult> HandleMergeAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context, CancellationToken cancellationToken)
 		{
 			Document documentFromEntity = EntityHelpers.GetDocumentFromEntity(operation.Entity, context, options);
 			RequestOptions requestOptions = GetRequestOptions(operation, options);
-			StoredProcedureResponse<string> storedProcedureResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityMergeAsync(table.Name, operation.OperationType, operation.PartitionKey, EtagHelper.ConvertToBackEndETagFormat(operation.ETag), client.DocumentClient, documentFromEntity, requestOptions, CancellationToken.None);
+			StoredProcedureResponse<string> storedProcedureResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityMergeAsync(table.Name, operation.OperationType, operation.PartitionKey, EtagHelper.ConvertToBackEndETagFormat(operation.ETag), client.DocumentClient, documentFromEntity, requestOptions, cancellationToken);
 			Document response = JsonConvert.DeserializeObject<List<Document>>(storedProcedureResponse.Response).FirstOrDefault();
-			return GetTableResultFromDocument(operation, response, context, options, options.SessionToken, storedProcedureResponse.RequestCharge);
+			return GetTableResultFromDocument(operation, response, context, options, storedProcedureResponse.SessionToken, storedProcedureResponse.RequestCharge);
 		}
 
-		private static async Task<TableResult> HandleInsertAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context)
+		private static async Task<TableResult> HandleInsertAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context, CancellationToken cancellationToken)
 		{
 			if (operation.IsTableEntity)
 			{
@@ -154,31 +154,31 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 				int? cosmosTableThroughput = tblEntity.GetCosmosTableThroughput();
 				IndexingPolicy cosmosTableIndexingPolicy = tblEntity.GetCosmosTableIndexingPolicy();
 				RequestOptions defaultRequestOptions = GetDefaultRequestOptions(null, cosmosTableThroughput);
-				return EntityHelpers.GetTableResultFromResponse(await DocumentCollectionBaseHelpers.HandleCollectionFeedInsertAsync(client.DocumentClient, cosmosTableName, cosmosTableIndexingPolicy, defaultRequestOptions), context);
+				return EntityHelpers.GetTableResultFromResponse(await DocumentCollectionBaseHelpers.HandleCollectionFeedInsertAsync(client.DocumentClient, cosmosTableName, cosmosTableIndexingPolicy, defaultRequestOptions, cancellationToken), context);
 			}
 			Document documentFromEntity = EntityHelpers.GetDocumentFromEntity(operation.Entity, context, options);
 			RequestOptions requestOptions = GetRequestOptions(operation, options);
-			ResourceResponse<Document> resourceResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityFeedInsertAsync(table.Name, client.DocumentClient, documentFromEntity, requestOptions, CancellationToken.None);
+			ResourceResponse<Document> resourceResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityFeedInsertAsync(table.Name, client.DocumentClient, documentFromEntity, requestOptions, cancellationToken);
 			return GetTableResultFromResponse(operation, resourceResponse, context, options, operation.SelectColumns, resourceResponse.SessionToken);
 		}
 
-		private static async Task<TableResult> HandleUpsertAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context)
+		private static async Task<TableResult> HandleUpsertAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context, CancellationToken cancellationToken)
 		{
 			Document documentFromEntity = EntityHelpers.GetDocumentFromEntity(operation.Entity, context, options);
 			RequestOptions requestOptions = GetRequestOptions(operation, options);
-			ResourceResponse<Document> resourceResponse = await client.DocumentClient.UpsertDocumentAsync(table.GetCollectionUri(), documentFromEntity, requestOptions, disableAutomaticIdGeneration: true);
+			ResourceResponse<Document> resourceResponse = await client.DocumentClient.UpsertDocumentAsync(table.GetCollectionUri(), documentFromEntity, requestOptions, disableAutomaticIdGeneration: true, cancellationToken);
 			return GetTableResultFromResponse(operation, resourceResponse, context, options, operation.SelectColumns, resourceResponse.SessionToken);
 		}
 
-		private static async Task<TableResult> HandleReplaceAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context)
+		private static async Task<TableResult> HandleReplaceAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context, CancellationToken cancellationToken)
 		{
 			Document documentFromEntity = EntityHelpers.GetDocumentFromEntity(operation.Entity, context, options);
 			RequestOptions requestOptions = GetRequestOptions(operation, options);
-			ResourceResponse<Document> resourceResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityReplaceOnlyAsync(table.Name, operation.PartitionKey, operation.RowKey, EtagHelper.ConvertToBackEndETagFormat(operation.ETag), client.DocumentClient, documentFromEntity, requestOptions);
+			ResourceResponse<Document> resourceResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityReplaceOnlyAsync(table.Name, operation.PartitionKey, operation.RowKey, EtagHelper.ConvertToBackEndETagFormat(operation.ETag), client.DocumentClient, documentFromEntity, requestOptions, cancellationToken);
 			return GetTableResultFromResponse(operation, resourceResponse, context, options, operation.SelectColumns, resourceResponse.SessionToken);
 		}
 
-		private static async Task<TableResult> HandleDeleteAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context)
+		private static async Task<TableResult> HandleDeleteAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context, CancellationToken cancellationToken)
 		{
 			if (operation.IsTableEntity)
 			{
@@ -187,11 +187,11 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 				return EntityHelpers.GetTableResultFromResponse(await client.DocumentClient.DeleteDocumentCollectionAsync(documentCollectionUri), context);
 			}
 			RequestOptions requestOptions = GetRequestOptions(operation, options);
-			ResourceResponse<Document> resourceResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityDeleteAsync(table.Name, operation.PartitionKey, operation.RowKey, EtagHelper.ConvertToBackEndETagFormat(operation.ETag), client.DocumentClient, requestOptions, CancellationToken.None);
+			ResourceResponse<Document> resourceResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityDeleteAsync(table.Name, operation.PartitionKey, operation.RowKey, EtagHelper.ConvertToBackEndETagFormat(operation.ETag), client.DocumentClient, requestOptions, cancellationToken);
 			return GetTableResultFromResponse(operation, resourceResponse, context, options, operation.SelectColumns, resourceResponse.SessionToken);
 		}
 
-		private static async Task<TableResult> HandleReadAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context)
+		private static async Task<TableResult> HandleReadAsync(TableOperation operation, CloudTableClient client, CloudTable table, TableRequestOptions options, OperationContext context, CancellationToken cancellationToken)
 		{
 			try
 			{
@@ -200,7 +200,7 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 					return EntityHelpers.GetTableResultFromResponse(await DocumentCollectionBaseHelpers.HandleDocumentCollectionRetrieveAsync(operation.GetCosmosTableName(), client.DocumentClient), context);
 				}
 				RequestOptions requestOptions = GetRequestOptions(operation, options);
-				ResourceResponse<Document> resourceResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityRetrieveAsync(table.Name, operation.PartitionKey, operation.RowKey, client.DocumentClient, requestOptions, CancellationToken.None);
+				ResourceResponse<Document> resourceResponse = await DocumentEntityCollectionBaseHelpers.HandleEntityRetrieveAsync(table.Name, operation.PartitionKey, operation.RowKey, client.DocumentClient, requestOptions, cancellationToken);
 				return GetTableResultFromResponse(operation, resourceResponse, context, options, operation.SelectColumns, resourceResponse.SessionToken);
 			}
 			catch (DocumentClientException ex)
@@ -231,7 +231,6 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 			if (operation.OperationType == TableOperationType.InsertOrReplace || operation.OperationType == TableOperationType.Replace || !operation.EchoContent)
 			{
 				tableResult.HttpStatusCode = 204;
-				return tableResult;
 			}
 			if (operation.OperationType != TableOperationType.Retrieve)
 			{

@@ -15,10 +15,10 @@ namespace Microsoft.Azure.Cosmos.Tables.SharedFiles
 			cancellationToken.ThrowIfCancellationRequested();
 			Uri uri = UriFactory.CreateDocumentUri("TablesDB", tableName, rowKey);
 			requestOptions = SetPartitionKey(requestOptions, partitionKey);
-			return await client.ReadDocumentAsync(uri.ToString(), requestOptions);
+			return await client.ReadDocumentAsync(uri.ToString(), requestOptions, cancellationToken);
 		}
 
-		public static async Task<ResourceResponse<Document>> HandleEntityReplaceOnlyAsync(string tableName, string partitionKey, string rowKey, string ifMatch, IDocumentClient client, Document document, RequestOptions requestOptions)
+		public static async Task<ResourceResponse<Document>> HandleEntityReplaceOnlyAsync(string tableName, string partitionKey, string rowKey, string ifMatch, IDocumentClient client, Document document, RequestOptions requestOptions, CancellationToken cancellationToken)
 		{
 			Uri uri = UriFactory.CreateDocumentUri("TablesDB", tableName, rowKey);
 			requestOptions = SetPartitionKey(requestOptions, partitionKey);
@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Cosmos.Tables.SharedFiles
 					Condition = ifMatch
 				};
 			}
-			return await client.ReplaceDocumentAsync(uri.ToString(), document, requestOptions);
+			return await client.ReplaceDocumentAsync(uri.ToString(), document, requestOptions, cancellationToken);
 		}
 
 		public static async Task<ResourceResponse<Document>> HandleEntityDeleteAsync(string tableName, string partitionKey, string rowKey, string ifMatch, IDocumentClient client, RequestOptions requestOptions, CancellationToken cancellationToken)

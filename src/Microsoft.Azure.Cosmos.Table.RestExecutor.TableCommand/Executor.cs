@@ -1,6 +1,7 @@
 using Microsoft.Azure.Cosmos.Table.RestExecutor.Common;
 using Microsoft.Azure.Cosmos.Table.RestExecutor.Utils;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,7 +74,9 @@ namespace Microsoft.Azure.Cosmos.Table.RestExecutor.TableCommand
 								Logger.LogInformational(executionState.OperationContext, "Response headers were processed successfully, proceeding with the rest of the operation.");
 							}
 							executionState.CurrentOperation = ExecutorOperation.GetResponseStream;
-							cmd.ResponseStream = await executionState.Resp.Content.ReadAsStreamAsync().ConfigureAwait(continueOnCapturedContext: false);
+							cmd.ResponseStream = new MemoryStream();
+							await(await executionState.Resp.Content.ReadAsStreamAsync()).WriteToAsync(cmd.ResponseStream, executionState, timeoutTokenSource.Token);
+							cmd.ResponseStream.Position = 0L;
 							if (executionState.ExceptionRef != null)
 							{
 								executionState.CurrentOperation = ExecutorOperation.BeginDownloadResponse;
@@ -81,7 +84,7 @@ namespace Microsoft.Azure.Cosmos.Table.RestExecutor.TableCommand
 								try
 								{
 									executionState2 = executionState;
-									executionState2.ExceptionRef = await StorageExceptionTranslator.TranslateExceptionWithPreBufferedStreamAsync(executionState.ExceptionRef, executionState.Cmd.CurrentResult, cmd.ResponseStream, executionState.Resp, executionState.Cmd.ParseErrorAsync);
+									executionState2.ExceptionRef = await StorageExceptionTranslator.TranslateExceptionWithPreBufferedStreamAsync(executionState.ExceptionRef, executionState.Cmd.CurrentResult, cmd.ResponseStream, executionState.Resp, executionState.Cmd.ParseErrorAsync, timeoutToken);
 									throw executionState.ExceptionRef;
 								}
 								finally

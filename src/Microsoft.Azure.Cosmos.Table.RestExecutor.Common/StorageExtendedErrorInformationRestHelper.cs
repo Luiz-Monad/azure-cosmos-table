@@ -24,6 +24,7 @@ namespace Microsoft.Azure.Cosmos.Table.RestExecutor.Common
 			{
 				using (XmlReader reader = XMLReaderExtensions.CreateAsAsync(inputStream))
 				{
+					await reader.ReadAsync().ConfigureAwait(continueOnCapturedContext: false);
 					cancellationToken.ThrowIfCancellationRequested();
 					StorageExtendedErrorInformation result = await ReadXmlAsync(reader, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 					cancellationToken.ThrowIfCancellationRequested();
@@ -116,9 +117,9 @@ namespace Microsoft.Azure.Cosmos.Table.RestExecutor.Common
 			}
 			if (response.Content.Headers.ContentType.MediaType.Contains("xml"))
 			{
-				return ReadFromStreamAsync(inputStream, CancellationToken.None);
+				return ReadFromStreamAsync(inputStream, token);
 			}
-			return ReadAndParseJsonExtendedErrorAsync(new NonCloseableStream(inputStream), CancellationToken.None);
+			return ReadAndParseJsonExtendedErrorAsync(new NonCloseableStream(inputStream), token);
 		}
 
 		internal static async Task<StorageExtendedErrorInformation> ReadAndParseJsonExtendedErrorAsync(Stream responseStream, CancellationToken cancellationToken)

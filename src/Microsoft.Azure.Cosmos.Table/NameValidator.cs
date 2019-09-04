@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.Azure.Cosmos.Table
 {
-	internal static class NameValidator
+	public static class NameValidator
 	{
 		private static readonly string[] ReservedFileNames = new string[25]
 		{

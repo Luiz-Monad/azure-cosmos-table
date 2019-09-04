@@ -19,7 +19,7 @@ namespace Microsoft.Azure.Cosmos.Table.RestExecutor.TableCommand
 			if (!string.IsNullOrEmpty(executionState.OperationContext.CustomUserAgent))
 			{
 				executionState.Req.Headers.UserAgent.TryParseAdd(executionState.OperationContext.CustomUserAgent);
-				executionState.Req.Headers.UserAgent.Add(new ProductInfoHeaderValue("Azure-Cosmos-Table", "1.0.2"));
+				executionState.Req.Headers.UserAgent.Add(new ProductInfoHeaderValue("Azure-Cosmos-Table", "1.0.4"));
 				executionState.Req.Headers.UserAgent.Add(new ProductInfoHeaderValue(TableRestConstants.HeaderConstants.UserAgentComment));
 			}
 			if (executionState.OperationContext.UserHeaders != null && executionState.OperationContext.UserHeaders.Count > 0)

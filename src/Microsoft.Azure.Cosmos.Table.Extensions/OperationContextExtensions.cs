@@ -18,7 +18,7 @@ namespace Microsoft.Azure.Cosmos.Table.Extensions
 			};
 		}
 
-		internal static RequestResult ToRequestResult<T>(this Microsoft.Azure.Documents.Client.FeedResponse<T> response)
+		internal static RequestResult ToRequestResult<T>(this FeedResponse<T> response)
 		{
 			return new RequestResult
 			{

@@ -22,8 +22,6 @@ namespace Microsoft.Azure.Cosmos.Table
 
 		internal const string MinuteMetricsName = "MinuteMetrics";
 
-		internal const string DeleteRetentionPolicyName = "DeleteRetentionPolicy";
-
 		internal const string VersionName = "Version";
 
 		internal const string DeleteName = "Delete";
@@ -84,23 +82,16 @@ namespace Microsoft.Azure.Cosmos.Table
 			set;
 		}
 
-		public DeleteRetentionPolicy DeleteRetentionPolicy
-		{
-			get;
-			set;
-		}
-
 		public ServiceProperties()
 		{
 		}
 
-		public ServiceProperties(LoggingProperties logging = null, MetricsProperties hourMetrics = null, MetricsProperties minuteMetrics = null, CorsProperties cors = null, DeleteRetentionPolicy deleteRetentionPolicy = null)
+		public ServiceProperties(LoggingProperties logging = null, MetricsProperties hourMetrics = null, MetricsProperties minuteMetrics = null, CorsProperties cors = null)
 		{
 			Logging = logging;
 			HourMetrics = hourMetrics;
 			MinuteMetrics = minuteMetrics;
 			Cors = cors;
-			DeleteRetentionPolicy = deleteRetentionPolicy;
 		}
 
 		internal static Task<ServiceProperties> FromServiceXmlAsync(XDocument servicePropertiesDocument)
@@ -111,8 +102,7 @@ namespace Microsoft.Azure.Cosmos.Table
 				Logging = ReadLoggingPropertiesFromXml(xElement.Element("Logging")),
 				HourMetrics = ReadMetricsPropertiesFromXml(xElement.Element("HourMetrics")),
 				MinuteMetrics = ReadMetricsPropertiesFromXml(xElement.Element("MinuteMetrics")),
-				Cors = ReadCorsPropertiesFromXml(xElement.Element("Cors")),
-				DeleteRetentionPolicy = ReadDeleteRetentionPolicyFromXml(xElement.Element("DeleteRetentionPolicy"))
+				Cors = ReadCorsPropertiesFromXml(xElement.Element("Cors"))
 			};
 			XElement xElement2 = xElement.Element("DefaultServiceVersion");
 			if (xElement2 != null)
@@ -124,7 +114,7 @@ namespace Microsoft.Azure.Cosmos.Table
 
 		internal XDocument ToServiceXml()
 		{
-			if (Logging == null && HourMetrics == null && MinuteMetrics == null && Cors == null && DeleteRetentionPolicy == null && DefaultServiceVersion == null)
+			if (Logging == null && HourMetrics == null && MinuteMetrics == null && Cors == null)
 			{
 				throw new InvalidOperationException("At least one service property needs to be non-null for SetServiceProperties API.");
 			}
@@ -148,10 +138,6 @@ namespace Microsoft.Azure.Cosmos.Table
 			if (DefaultServiceVersion != null)
 			{
 				xElement.Add(new XElement("DefaultServiceVersion", DefaultServiceVersion));
-			}
-			if (DeleteRetentionPolicy != null)
-			{
-				xElement.Add(GenerateDeleteRetentionPolicyXml(DeleteRetentionPolicy));
 			}
 			return new XDocument(xElement);
 		}
@@ -214,28 +200,6 @@ namespace Microsoft.Azure.Cosmos.Table
 				xElement.Add(content);
 			}
 			return xElement;
-		}
-
-		private static XElement GenerateDeleteRetentionPolicyXml(DeleteRetentionPolicy deleteRetentionPolicy)
-		{
-			CommonUtility.AssertNotNull("deleteRetentionPolicy", deleteRetentionPolicy);
-			bool enabled = deleteRetentionPolicy.Enabled;
-			XElement xElement = new XElement("DeleteRetentionPolicy", new XElement("Enabled", enabled));
-			if (!enabled)
-			{
-				return xElement;
-			}
-			if (deleteRetentionPolicy.RetentionDays.HasValue && deleteRetentionPolicy.RetentionDays.Value >= 1)
-			{
-				int? retentionDays = deleteRetentionPolicy.RetentionDays;
-				int maximumAllowedRetentionDays = TableRestConstants.MaximumAllowedRetentionDays;
-				if (retentionDays.GetValueOrDefault() <= maximumAllowedRetentionDays || !retentionDays.HasValue || 1 == 0)
-				{
-					xElement.Add(new XElement("Days", deleteRetentionPolicy.RetentionDays.Value));
-					return xElement;
-				}
-			}
-			throw new ArgumentException("The delete retention policy is enabled but the RetentionDays property is not specified or has an invalid value. RetentionDays must be greater than 0 and less than or equal to 365 days.");
 		}
 
 		private static LoggingProperties ReadLoggingPropertiesFromXml(XElement element)
@@ -315,25 +279,6 @@ namespace Microsoft.Azure.Cosmos.Table
 				MaxAgeInSeconds = int.Parse(rule.Element("MaxAgeInSeconds").Value, CultureInfo.InvariantCulture)
 			}).ToList();
 			return corsProperties;
-		}
-
-		internal static DeleteRetentionPolicy ReadDeleteRetentionPolicyFromXml(XElement element)
-		{
-			if (element == null)
-			{
-				return null;
-			}
-			DeleteRetentionPolicy deleteRetentionPolicy = new DeleteRetentionPolicy
-			{
-				Enabled = false,
-				RetentionDays = null
-			};
-			deleteRetentionPolicy.Enabled = bool.Parse(element.Element("Enabled").Value);
-			if (deleteRetentionPolicy.Enabled)
-			{
-				deleteRetentionPolicy.RetentionDays = int.Parse(element.Element("Days").Value, CultureInfo.InvariantCulture);
-			}
-			return deleteRetentionPolicy;
 		}
 
 		private static int? ReadRetentionPolicyFromXml(XElement element)
